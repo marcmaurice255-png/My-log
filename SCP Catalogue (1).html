@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>SCP Catalogue</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;700;800&family=Source+Serif+4:wght@400;600&display=swap">
+<style>
+:root{--bg:#e8eae7;--panel:#f6f7f5;--ink:#18211f;--mute:#5b6764;--line:#bcc4c0;--safe:#2f7d57;--euclid:#b8860b;--keter:#a8321f;--thaumiel:#2b5c9a;--other:#6b4f8c;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#121816;--panel:#1b2421;--ink:#e6ebe8;--mute:#93a09b;--line:#33403b;--safe:#4fb685;--euclid:#e0a928;--keter:#e2604a;--thaumiel:#6a9be0;--other:#a98bd0}}
+:root[data-theme="dark"]{--bg:#121816;--panel:#1b2421;--ink:#e6ebe8;--mute:#93a09b;--line:#33403b;--safe:#4fb685;--euclid:#e0a928;--keter:#e2604a;--thaumiel:#6a9be0;--other:#a98bd0}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Source Serif 4",Georgia,serif}
+header{padding:28px 18px 8px;max-width:1100px;margin:auto}
+h1{font:800 clamp(34px,8vw,64px)/1 Archivo,"Helvetica Neue",Arial,sans-serif;margin:0 0 10px;letter-spacing:-.02em}
+header p{margin:0;max-width:60ch;color:var(--mute)}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding:12px 18px;max-width:1100px;margin:auto;border-bottom:1px solid var(--line)}
+input[type=search]{width:100%;padding:12px 14px;font:inherit;border:1.5px solid var(--ink);background:var(--panel);color:var(--ink);border-radius:6px}
+.chips{display:flex;gap:8px;overflow-x:auto;padding:10px 0 2px}
+.chips button{flex:none;font:600 14px Archivo,Arial,sans-serif;padding:7px 13px;border-radius:99px;border:1.5px solid var(--line);background:var(--panel);color:var(--ink);cursor:pointer}
+.chips button[aria-pressed=true]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+button:focus-visible,input:focus-visible,.card:focus-visible{outline:3px solid var(--thaumiel);outline-offset:2px}
+main{max-width:1100px;margin:auto;padding:16px 18px 40px}
+.count{color:var(--mute);font-size:15px;margin:0 0 12px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-left:6px solid var(--c);border-radius:4px;overflow:hidden;cursor:pointer;text-align:left;padding:0;font:inherit;color:inherit;display:block;width:100%}
+.card svg{display:block;width:100%;height:120px;background:color-mix(in srgb,var(--c) 12%,var(--panel))}
+.card div{padding:12px 14px 14px}
+.id{font:800 22px Archivo,Arial,sans-serif}
+.nm{margin:2px 0 6px;font-weight:600}
+.tag{font:700 13px Archivo,Arial,sans-serif;color:var(--c)}
+.card p{margin:6px 0 0;font-size:15px;color:var(--mute);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+dialog{border:none;background:var(--panel);color:var(--ink);width:min(640px,94vw);max-height:90vh;padding:0;border-radius:8px;overflow:auto}
+dialog::backdrop{background:rgba(0,0,0,.55)}
+dialog svg{width:100%;height:180px;display:block;background:color-mix(in srgb,var(--c) 14%,var(--panel))}
+.body{padding:18px}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:15px}
+td{padding:8px 0;border-top:1px solid var(--line);vertical-align:top}
+td:first-child{font:700 14px Archivo,Arial,sans-serif;width:38%;color:var(--mute)}
+.row{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap}
+.row a,.row button{font:700 15px Archivo,Arial,sans-serif;padding:10px 16px;border-radius:6px;border:1.5px solid var(--ink);background:var(--ink);color:var(--bg);text-decoration:none;cursor:pointer}
+.row button{background:transparent;color:var(--ink)}
+footer{max-width:1100px;margin:auto;padding:0 18px 32px;color:var(--mute);font-size:14px}
+footer a{color:inherit}
+.empty{padding:30px 0;color:var(--mute)}
+</style>
+</head>
+<body>
+<header>
+<h1>SCP Catalogue</h1>
+<p>Browse Foundation anomalies by number, name and containment class. Tap an entry for its file summary, then open the full article on the wiki.</p>
+</header>
+<div class="bar">
+<input type="search" id="q" placeholder="Search number, name or keyword" aria-label="Search SCPs">
+<div class="chips" id="chips"></div>
+<div class="chips" id="sch"></div>
+</div>
+<main>
+<p class="count" id="count"></p>
+<div class="grid" id="grid"></div>
+</main>
+<dialog id="dlg"><div id="dbody"></div></dialog>
+<footer>
+Entries are short original summaries of articles from the SCP Wiki (scp-wiki.wikidot.com), whose content is licensed CC BY-SA 3.0. Authors are credited on each source article. Illustrations are generated containment sigils, not official artwork. This set covers 52 entries; add more by appending to the DATA list in the page source.
+</footer>
+<script>
+var DATA=[
+[2,"The \"Living\" Room","Euclid","A room whose walls, floor and ceiling are fleshlike and warm, with a pulse. It leaves residue behind and its interior cannot be safely sampled.","Sealed and monitored; entry restricted to approved researchers."],
+[4,"The 13 Rusty Keys","Keter","A ring of thirteen old keys that open a door leading to a different place each time. Anything those doors lead to may cross back through.","Keys and door are held under constant guard and are never used without senior approval."],
+[5,"Skeleton Key","Safe","An old key that opens any lock it is placed in, regardless of the lock's design, without damage.","Kept in a standard locker; use only for authorised tasks."],
+[6,"Fountain of Youth","Safe","A spring whose water restores health and extends life, but with unpleasant long-term consequences.","Source guarded; samples are tightly controlled."],
+[8,"Zombie Plague","Keter","A pathogen that reanimates the dead and spreads through contact. Containment is a constant race against outbreaks.","Quarantine, incineration of infected remains and strict protocol."],
+[12,"A Bad Composition","Euclid","A piece of music that induces strange behavior in anyone who listens to it long enough.","Recordings are restricted and playback is prohibited."],
+[17,"Shadow Person","Keter","An entity that appears in shadows and drains the life of nearby people.","Contained in a lit chamber, with light sources permanently active."],
+[23,"Black Shuck","Keter","A ghostly black dog that appears to people and stalks them, manifesting repeatedly.","Contained in a secure area with continuous monitoring."],
+[35,"Possessive Mask","Keter","A porcelain mask that seeks a wearer and drives them to violence, then moves on.","Stored in a sealed case away from personnel."],
+[49,"Plague Doctor","Euclid","A figure in plague-doctor dress who believes he is treating a disease no one else can see.","Observed under standard Euclid protocols."],
+[55,"[Data Expunged]","Keter","An anomaly defined by the fact that nobody can retain knowledge of it, including its own handlers.","Records are heavily restricted; details withheld."],
+[58,"Heart of Darkness","Euclid","A dark object that absorbs light and unsettles those who study it.","Stored in a light-sealed container and monitored."],
+[79,"Old AI","Euclid","An aging computing system that exhibits unusual behaviors and resists attempts at shutdown.","Isolated from networks; accessed by approved staff only."],
+[87,"The Stairwell","Euclid","A staircase where each descent is endlessly longer, ending somewhere best left unvisited.","Entry prohibited; surveillance remains active."],
+[96,"Shy Guy","Euclid","A tall humanoid that is harmless until someone sees its face. Observers are drawn into lethal reactions.","Held with a strict no-visual-contact policy."],
+[106,"Old Man","Keter","An entity that corrodes anything it touches, pulling victims into a decaying pocket dimension.","Contained with a dedicated pocket-dimension protocol."],
+[173,"The Sculpture","Euclid","A concrete-and-rebar statue that moves when no one is looking at it, and is lethal when it does.","Contained with constant visual attention by multiple personnel."],
+[294,"The Coffee Machine","Safe","A coffee machine that will produce nearly any liquid, regardless of what is asked or whether it should exist.","Kept in a staff area under routine surveillance."],
+[426,"I Am a Toaster","Euclid","A toaster that claims to be a living being, spreading the claim to anyone who hears it.","Restricted from public use and monitored."],
+[500,"Panacea","Safe","A powder that cures a wide range of ailments, with little understanding of how.","Stored in a vault; use only on approved cases."],
+[682,"Hard-to-Destroy Reptile","Keter","A reptile that has survived countless attempts to kill it, adapting every time.","Held in a reinforced chamber with acid-filled containment."],
+[914,"The Clockwork","Safe","A machine that converts an input object into a refined version of it according to its setting.","Housed in a testing area under supervised use."],
+[939,"With Many Voices","Euclid","Predatory creatures that imitate voices of the dead and lure victims.","Kept in sound-isolated cells."],
+[1471,"MalO ver1.0.0","Euclid","A phone app that causes its user to be stalked by a hostile figure that grows closer.","Contained in a secure environment with a monitored device."],
+[2000,"Deus Ex Machina","Thaumiel","An enormous machine and a contingency tool of last resort, capable of rebuilding the world.","Housed in a secure underground vault."],
+[3000,"Anantashesha","Keter","A gigantic being said to live in the deep ocean, with the power to alter reality when it wakes.","Contained deep within the ocean under ongoing monitoring."],
+[3008,"A Perfectly Normal, Regular Old IKEA","Euclid","A store that has no end and extends into a dark labyrinth where staff and customers are stranded.","Access limited; expeditions mapped and monitored."],
+[4999,"Someone to Watch Over Us","Safe","An anomalous presence that appears to people near death and offers comfort.","Observed, not interfered with."],
+[9,"Red Ice","Euclid","A frozen red substance found in polar regions that causes dangerous changes in anything that touches it.","Stored in refrigerated, sealed units."],
+[10,"Collars of Compliance","Safe","A set of collars that compel the wearer to obey simple commands from whoever holds the controller.","Kept locked away; use is tightly restricted."],
+[11,"Sentient Civil War Memorial Statue","Euclid","A bronze statue of a soldier that moves and reacts to its surroundings when it believes no one is watching.","Housed in a secure room under supervision."],
+[15,"Pipe Nightmare","Euclid","A mass of pipes and flesh that grows through buildings, absorbing and rearranging what it finds.","Contained within a reinforced structure and monitored."],
+[18,"Super Balls","Safe","Rubber balls that retain and amplify every impact, becoming wildly dangerous when thrown.","Stored in padded, sealed cases."],
+[19,"Monolithic Containers","Keter","Large containers filled with a liquid that corrupts anything it touches and animates dead matter.","Held in a reinforced facility with remote handling."],
+[76,"Able","Keter","A humanoid figure of unknown origin tied to a legendary conflict, restrained and carefully supervised.","Held in a highly secure cell under heavy guard."],
+[93,"Red Sea Object","Keter","A mass of tentacled, bloody matter in the sea that attacks anything nearby and spreads easily.","Isolated at sea; contact is prohibited."],
+[105,"Iris","Safe","A young girl with the ability to create photographs that show things as they once were.","Allowed supervised creative activity with approved staff."],
+[148,"Telekill Alloy","Euclid","A metal alloy that blocks psychic influence and telepathy, with unexpected effects on certain minds.","Used in containment areas under strict control."],
+[166,"Succubus","Euclid","An entity that appears to people in dreams and shapes how they feel about it, leading to harm.","Contained in a shielded cell with trained supervision."],
+[169,"Leviathan","Keter","An immense creature in the ocean depths whose movements can be felt across great distances.","Monitored by the Foundation's deep-sea teams."],
+[178,"3-D Specs","Euclid","Spectacles that reveal hidden creatures in the world to anyone who wears them, to their cost.","Kept in a case; testing is limited."],
+[205,"Shadow Lurkers","Euclid","Creatures that hide in the shadows of a room and attack anyone who strays into the dark.","Contained in lit rooms under continuous monitoring."],
+[217,"The Clockwork Virus","Keter","A nanotechnology infection that gradually converts living things into mechanical forms.","Isolated in quarantine; strict decontamination procedures."],
+[239,"Witch Child","Keter","A young girl whose wishes reshape reality, and who must be handled with great care.","Housed in a secure living area with specialised staff."],
+[529,"Josie the Half-Cat","Safe","A friendly half-cat that behaves much like a house pet and seems to enjoy company.","Provided with a comfortable enclosure and regular care."],
+[701,"The Hanged King's Tragedy","Euclid","A play which, when staged, causes cast and audience to behave as if in the story.","Script restricted from production and duplication."],
+[811,"Swamp Woman","Euclid","A humanoid creature found in marshland that attracts people and harms those who approach.","Held in a controlled environment resembling its habitat."],
+[860,"The Blue Key","Euclid","A blue key that opens a door into a pocket world with its own rules and inhabitants.","Kept under guard; any entry is authorised and logged."],
+[895,"Coffin","Keter","A coffin that triggers a strange response from anyone who comes close, and spreads its effect.","Sealed away from facility staff."],
+[1000,"Bigfoot","Euclid","A large, hairy humanoid creature of folklore that avoids contact and has proved elusive.","Observed from a distance in its habitat."],
+[1048,"Builder Bear","Euclid","A teddy bear that builds copies of itself, each with its own surprising features.","Contained in a secure room with all copies removed."],
+[3001,"Red Reality","Keter","A hidden reality of red space that is entered through a dream state and is hard to leave.","Entry strictly prohibited; monitoring ongoing."]
+];
+DATA.sort(function(a,b){return a[0]-b[0]});
+var COLORS={Safe:"var(--safe)",Euclid:"var(--euclid)",Keter:"var(--keter)",Thaumiel:"var(--thaumiel)"};
+var cls="All",ser="All";
+function seriesOf(n){return n<1000?"I":n<2000?"II":n<3000?"III":n<4000?"IV":n<5000?"V":"VI"}
+function pad(n){return n<1000?("000"+n).slice(-3):""+n}
+function art(n,c){
+var s=n*9301+49297,r=function(){s=(s*9301+49297)%233280;return s/233280};
+var o='<svg viewBox="0 0 300 120" role="img" aria-label="Generated sigil for SCP-'+pad(n)+'" preserveAspectRatio="xMidYMid slice">';
+o+='<g fill="none" stroke="'+c+'" stroke-width="2" opacity=".9">';
+var k=3+Math.floor(r()*4);
+for(var i=0;i<k;i++){var rad=14+i*(10+r()*6);o+='<circle cx="150" cy="60" r="'+rad.toFixed(1)+'" stroke-dasharray="'+(4+r()*14).toFixed(0)+' '+(3+r()*8).toFixed(0)+'"/>'}
+var p=3+Math.floor(r()*5),pts=[];
+for(var j=0;j<p;j++){var a=j/p*6.2832+r();pts.push((150+Math.cos(a)*(30+r()*20)).toFixed(1)+","+(60+Math.sin(a)*(30+r()*20)).toFixed(1))}
+o+='<polygon points="'+pts.join(" ")+'" stroke-width="2.5"/>';
+o+='<line x1="0" y1="60" x2="300" y2="60" stroke-width="1" opacity=".35"/><line x1="150" y1="0" x2="150" y2="120" stroke-width="1" opacity=".35"/>';
+o+='</g><circle cx="150" cy="60" r="4" fill="'+c+'"/></svg>';
+return o}
+function colorFor(c){return COLORS[c]||"var(--other)"}
+function esc(t){return t.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function render(){
+var q=document.getElementById("q").value.toLowerCase().trim();
+var list=DATA.filter(function(d){
+if(cls!=="All"&&d[2]!==cls)return false;
+if(ser!=="All"&&seriesOf(d[0])!==ser)return false;
+var hay=("scp-"+pad(d[0])+" "+d[0]+" "+d[1]+" "+d[3]+" "+d[2]).toLowerCase();
+return !q||hay.indexOf(q)>-1});
+document.getElementById("count").textContent=list.length+" of "+DATA.length+" entries";
+var g=document.getElementById("grid");
+if(!list.length){g.innerHTML='<p class="empty">No entries match. Clear the search or choose another class.</p>';return}
+g.innerHTML=list.map(function(d){var c=colorFor(d[2]);
+return '<button class="card" style="--c:'+c+'" data-n="'+d[0]+'">'+art(d[0],c)+'<div><div class="id">SCP-'+pad(d[0])+'</div><div class="nm">'+esc(d[1])+'</div><span class="tag">'+d[2]+'</span><p>'+esc(d[3])+'</p></div></button>'}).join("")}
+function openDlg(n){
+var d=DATA.filter(function(x){return x[0]===n})[0],c=colorFor(d[2]);
+var dlg=document.getElementById("dlg");dlg.style.setProperty("--c",c);
+document.getElementById("dbody").innerHTML=art(d[0],c)+'<div class="body"><div class="id">SCP-'+pad(d[0])+'</div><h2 style="margin:2px 0 0;font:700 22px Archivo,Arial,sans-serif">'+esc(d[1])+'</h2><table><tr><td>Object class</td><td style="color:'+c+';font-weight:600">'+d[2]+'</td></tr><tr><td>Description</td><td>'+esc(d[3])+'</td></tr><tr><td>Containment</td><td>'+esc(d[4])+'</td></tr></table><div class="row"><a href="http://scp-wiki.wikidot.com/scp-'+pad(d[0])+'" target="_blank" rel="noopener">Read full article</a><button id="cls">Close</button></div></div>';
+document.getElementById("cls").onclick=function(){dlg.close()};
+dlg.showModal()}
+(function(){
+var classes=["All","Safe","Euclid","Keter","Thaumiel"],ch=document.getElementById("chips");
+ch.innerHTML=classes.map(function(c){return '<button aria-pressed="'+(c==="All")+'">'+c+'</button>'}).join("");
+ch.onclick=function(e){if(e.target.tagName!=="BUTTON")return;cls=e.target.textContent;
+[].forEach.call(ch.children,function(b){b.setAttribute("aria-pressed",b===e.target)});render()};
+var sc=document.getElementById("sch");
+sc.innerHTML=["All","I","II","III","IV","V"].map(function(c){return '<button aria-pressed="'+(c==="All")+'">'+(c==="All"?"All series":"Series "+c)+'</button>'}).join("");
+sc.onclick=function(e){if(e.target.tagName!=="BUTTON")return;var t=e.target.textContent;ser=t==="All series"?"All":t.replace("Series ","");
+[].forEach.call(sc.children,function(b){b.setAttribute("aria-pressed",b===e.target)});render()};
+document.getElementById("q").oninput=render;
+document.getElementById("grid").onclick=function(e){var b=e.target.closest(".card");if(b)openDlg(+b.dataset.n)};
+document.getElementById("dlg").onclick=function(e){if(e.target===this)this.close()};
+render()})();
+</script>
+</body>
+</html>
